@@ -2,6 +2,7 @@ package pkg
 
 import (
 	"bufio"
+	"bytes"
 	"io"
 	"strconv"
 )
@@ -32,4 +33,42 @@ func ReadLines(r io.Reader) ([]string, error) {
 		result = append(result, scanner.Text())
 	}
 	return result, scanner.Err()
+}
+
+// ReadLines reads \n separated strings from r. If there's an error, it
+// returns the lines successfully read so far as well as the error value.
+func ReadByDelimiter(r io.Reader, delimiter string) ([]string, error) {
+	scanner := bufio.NewScanner(r)
+	scanner.Split(SplitAt(delimiter))
+	var result []string
+	for scanner.Scan() {
+		result = append(result, scanner.Text())
+	}
+	return result, scanner.Err()
+}
+
+func SplitAt(substring string) func(data []byte, atEOF bool) (advance int, token []byte, err error) {
+	searchBytes := []byte(substring)
+	searchLen := len(searchBytes)
+	return func(data []byte, atEOF bool) (advance int, token []byte, err error) {
+		dataLen := len(data)
+
+		// Return nothing if at end of file and no data passed
+		if atEOF && dataLen == 0 {
+			return 0, nil, nil
+		}
+
+		// Find next separator and return token
+		if i := bytes.Index(data, searchBytes); i >= 0 {
+			return i + searchLen, data[0:i], nil
+		}
+
+		// If we're at EOF, we have a final, non-terminated line. Return it.
+		if atEOF {
+			return dataLen, data, nil
+		}
+
+		// Request more data.
+		return 0, nil, nil
+	}
 }
