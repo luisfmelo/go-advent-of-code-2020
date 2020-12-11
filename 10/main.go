@@ -52,7 +52,6 @@ func FindDevicesChainN1JoltDiffTimesN3DiffJoltDifferences(devicesJolt []int) int
 }
 
 func main() {
-	defer pkg.Elapsed("AdventO of Code 2020 - Day 10")()
 	file, err := os.Open("10/input.txt")
 	if err != nil {
 		panic(err)
