@@ -35,7 +35,6 @@ func ReadLines(r io.Reader) ([]string, error) {
 	return result, scanner.Err()
 }
 
-
 // ReadLines reads \n separated strings from r. If there's an error, it
 // returns the lines successfully read so far as well as the error value.
 func ReadByDelimiter(r io.Reader, delimiter string) ([]string, error) {
@@ -44,6 +43,15 @@ func ReadByDelimiter(r io.Reader, delimiter string) ([]string, error) {
 	var result []string
 	for scanner.Scan() {
 		result = append(result, scanner.Text())
+	}
+	return result, scanner.Err()
+}
+func ReadIntsByDelimiter(r io.Reader, delimiter string) ([]int, error) {
+	scanner := bufio.NewScanner(r)
+	scanner.Split(SplitAt(delimiter))
+	var result []int
+	for scanner.Scan() {
+		result = append(result, StrToInt(scanner.Text()))
 	}
 	return result, scanner.Err()
 }
@@ -73,7 +81,6 @@ func SplitAt(substring string) func(data []byte, atEOF bool) (advance int, token
 		return 0, nil, nil
 	}
 }
-
 
 // ReadMatrix reads \n separated strings from r. And then each character.
 // If there's an error, it returns the lines successfully read so far as well as the error value.
